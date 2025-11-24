@@ -1,18 +1,30 @@
 "use client";
 
-import { useAtomValue } from "jotai";
-import { useMemo } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { appointmentsAtom } from "@/atoms/atoms";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { appointmentsAtom, persistAppointmentsAtom } from "@/atoms/atoms";
 import { format, parse, isToday, isTomorrow, isPast } from "date-fns";
-import { ArrowLeft, Calendar, Clock, User, FileText, Stethoscope } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User, FileText, Stethoscope, X, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import type { Appointment } from "@/types/Doctor";
 
 const AppointmentPage = () => {
   const appointments = useAtomValue(appointmentsAtom);
+  const setAppointments = useSetAtom(persistAppointmentsAtom);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
 
   // Group appointments by date
   const groupedAppointments = useMemo(() => {
@@ -62,6 +74,31 @@ const AppointmentPage = () => {
     } catch {
       return false;
     }
+  };
+
+  const handleCancelClick = (appointment: Appointment) => {
+    setAppointmentToCancel(appointment);
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (!appointmentToCancel) return;
+
+    // Remove appointment from list
+    const updatedAppointments = appointments.filter(
+      (apt) => apt.id !== appointmentToCancel.id
+    );
+    setAppointments(updatedAppointments);
+
+    // Show success toast
+    toast.success("Appointment Cancelled", {
+      description: `Your appointment with ${appointmentToCancel.doctorName} on ${format(parse(appointmentToCancel.date, "yyyy-MM-dd", new Date()), "PPP")} at ${appointmentToCancel.timeSlot} has been cancelled.`,
+      duration: 5000,
+    });
+
+    // Close dialog and reset
+    setCancelDialogOpen(false);
+    setAppointmentToCancel(null);
   };
 
   return (
@@ -165,11 +202,22 @@ const AppointmentPage = () => {
                             </div>
                           </div>
 
-                          {/* Right: Appointment ID */}
-                          <div className="text-right">
+                          {/* Right: Actions */}
+                          <div className="flex flex-col items-end gap-2">
                             <Badge variant="outline" className="text-xs">
                               ID: {appointment.id.slice(0, 8)}
                             </Badge>
+                            {!isAppointmentPast(date) && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleCancelClick(appointment)}
+                                className="text-xs"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                Cancel
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -180,6 +228,53 @@ const AppointmentPage = () => {
             ))}
           </div>
         )}
+
+        {/* Cancel Confirmation Dialog */}
+        <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Appointment</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {appointmentToCancel && (
+              <div className="py-4 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Stethoscope className="h-4 w-4 text-primary" />
+                  <span className="font-medium">{appointmentToCancel.doctorName}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>
+                    {format(parse(appointmentToCancel.date, "yyyy-MM-dd", new Date()), "PPP")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{appointmentToCancel.timeSlot}</span>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCancelDialogOpen(false);
+                  setAppointmentToCancel(null);
+                }}
+              >
+                Keep Appointment
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmCancel}>
+                <X className="h-4 w-4 mr-2" />
+                Cancel Appointment
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
