@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,46 +11,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Search } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Search, ArrowUpDown } from "lucide-react";
 import { mockDoctors } from "@/data/mockDoctor";
 import DoctorListCard from "@/components/DoctorListCard";
 import DoctorDetailsDialog from "@/components/DoctorDetailsDialog";
+import BookAppointmentModal from "@/components/BookAppointmentModal";
 import { format } from "date-fns";
+import { useDebounce } from "@/hooks/use-debounce";
+import type { Doctor } from "@/types/Doctor";
+
+type SortOption = "rating" | "experience" | "alpha" | "none";
 
 const Dashboard = () => {
   const [searchName, setSearchName] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("all");
+  const [acceptingNewPatients, setAcceptingNewPatients] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("none");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [selectedDoctor, setSelectedDoctor] = useState<typeof mockDoctors[number] | null>(null);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [doctorToBook, setDoctorToBook] = useState<Doctor | null>(null);
+
+  // Debounce search input
+  const debouncedSearch = useDebounce(searchName, 300);
 
   // Get unique specialties
   const specialties = Array.from(new Set(mockDoctors.map((d) => d.specialty)));
 
-  // Filter doctors
-  const filteredDoctors = mockDoctors.filter((doctor) => {
-    const matchesName = doctor.name.toLowerCase().includes(searchName.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === "all" || doctor.specialty === selectedSpecialty;
-    
-    let matchesDate = true;
-    if (selectedDate) {
-      const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
-      matchesDate = doctor.availableSlots.some((slot) => 
-        slot.startsWith(selectedDateStr)
-      );
+  // Filter and sort doctors
+  const filteredDoctors = useMemo(() => {
+    let filtered = mockDoctors.filter((doctor) => {
+      const matchesName = doctor.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                         doctor.specialty.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const matchesSpecialty = selectedSpecialty === "all" || doctor.specialty === selectedSpecialty;
+      const matchesAccepting = !acceptingNewPatients || doctor.acceptingNewPatients;
+      
+      let matchesDate = true;
+      if (selectedDate) {
+        const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
+        matchesDate = doctor.availableSlots.some((slot) => 
+          slot.startsWith(selectedDateStr)
+        );
+      }
+
+      return matchesName && matchesSpecialty && matchesDate && matchesAccepting;
+    });
+
+    // Apply sorting
+    if (sortBy !== "none") {
+      filtered = [...filtered].sort((a, b) => {
+        switch (sortBy) {
+          case "rating":
+            return b.rating - a.rating; // High to low
+          case "experience":
+            return b.yearsExperience - a.yearsExperience; // High to low
+          case "alpha":
+            return a.name.localeCompare(b.name); // A-Z
+          default:
+            return 0;
+        }
+      });
     }
 
-    return matchesName && matchesSpecialty && matchesDate;
-  });
+    return filtered;
+  }, [debouncedSearch, selectedSpecialty, acceptingNewPatients, sortBy, selectedDate]);
 
-  const handleViewDetails = (doctor: typeof mockDoctors[number]) => {
+  const handleViewDetails = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
     setDetailsDialogOpen(true);
   };
 
-  const handleBookAppointment = (doctor: typeof mockDoctors[number]) => {
-    console.log("Booking appointment with:", doctor.name);
-    // TODO: Implement booking logic
+  const handleBookAppointment = (doctor: Doctor) => {
+    setDoctorToBook(doctor);
+    setBookingModalOpen(true);
+    setDetailsDialogOpen(false);
   };
 
   return (
@@ -75,32 +112,80 @@ const Dashboard = () => {
           <div className="space-y-6">
             {/* Search and Filters */}
             <div className="bg-card rounded-lg border border-border p-4 space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Search by Name */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by doctor name..."
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className="pl-9"
-                  />
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or specialty..."
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              {/* Filters Row */}
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Filter by Specialty */}
+                <div className="space-y-2">
+                  <Label htmlFor="specialty" className="text-sm font-medium">
+                    Specialty
+                  </Label>
+                  <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
+                    <SelectTrigger id="specialty">
+                      <SelectValue placeholder="Select specialty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Specialties</SelectItem>
+                      {specialties.map((specialty) => (
+                        <SelectItem key={specialty} value={specialty}>
+                          {specialty}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Filter by Specialty */}
-                <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select specialty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Specialties</SelectItem>
-                    {specialties.map((specialty) => (
-                      <SelectItem key={specialty} value={specialty}>
-                        {specialty}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {/* Sort Dropdown */}
+                <div className="space-y-2">
+                  <Label htmlFor="sort" className="text-sm font-medium">
+                    Sort By
+                  </Label>
+                  <Select 
+                    value={sortBy} 
+                    onValueChange={(value) => setSortBy(value as SortOption)}
+                  >
+                    <SelectTrigger id="sort">
+                      <ArrowUpDown className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Sort by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="rating">Rating (High to Low)</SelectItem>
+                      <SelectItem value="experience">Experience (High to Low)</SelectItem>
+                      <SelectItem value="alpha">Alphabetical (A-Z)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Accepting New Patients Toggle */}
+                <div className="space-y-2">
+                  <Label htmlFor="accepting" className="text-sm font-medium">
+                    Filters
+                  </Label>
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Switch
+                      id="accepting"
+                      checked={acceptingNewPatients}
+                      onCheckedChange={setAcceptingNewPatients}
+                    />
+                    <Label
+                      htmlFor="accepting"
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      Accepting New Patients
+                    </Label>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -152,6 +237,13 @@ const Dashboard = () => {
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         onBookAppointment={handleBookAppointment}
+      />
+
+      {/* Booking Modal */}
+      <BookAppointmentModal
+        doctor={doctorToBook}
+        open={bookingModalOpen}
+        onOpenChange={setBookingModalOpen}
       />
     </div>
   );
