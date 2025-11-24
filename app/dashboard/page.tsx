@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Search, ArrowUpDown } from "lucide-react";
+import { ArrowLeft, Search, ArrowUpDown, CalendarCheck } from "lucide-react";
 import { mockDoctors } from "@/data/mockDoctor";
 import DoctorListCard from "@/components/DoctorListCard";
 import DoctorDetailsDialog from "@/components/DoctorDetailsDialog";
@@ -95,12 +95,20 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/">
+              <Button variant="ghost">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+            <Link href="/appointment">
+              <Button variant="outline">
+                <CalendarCheck className="h-4 w-4 mr-2" />
+                Check your Appointments
+              </Button>
+            </Link>
+          </div>
           <h1 className="text-3xl font-bold text-foreground">Book an Appointment</h1>
           <p className="text-muted-foreground mt-2">
             Search for doctors and check their availability
