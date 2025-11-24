@@ -1,10 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Award } from "lucide-react";
-import { Doctor } from "@/data/mockDoctor";
+import { mockDoctors } from "@/data/mockDoctor";
 
 interface DoctorCardProps {
-  doctor: Doctor;
+  doctor: typeof mockDoctors[number];
 }
 
 const DoctorCard = ({ doctor }: DoctorCardProps) => {
