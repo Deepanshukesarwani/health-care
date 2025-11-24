@@ -4,7 +4,7 @@ export interface Doctor {
   id: string;
   name: string;
   specialty: Specialty;
-  experience: number; // years
+  yearsExperience: number; // years
   location: string;
   rating: number; // 1-5
   acceptingNewPatients: boolean;

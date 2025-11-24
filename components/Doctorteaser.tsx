@@ -18,7 +18,7 @@ const DoctorTeaser = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {mockDoctors.map((doctor) => (
+          {mockDoctors.slice(0, 4).map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>
