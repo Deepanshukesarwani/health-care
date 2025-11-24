@@ -9,21 +9,28 @@ export const specialtyFilterAtom = atom<string | null>(null);
 export const acceptingFilterAtom = atom(false);
 export const sortAtom = atom<'rating'|'experience'|'alpha' | null>(null);
 
-// appointments
-export const appointmentsAtom = atom<Appointment[]>(
-  (get) => {
-    // initialize from localStorage if present
-    if (typeof window !== 'undefined') {
-      const raw = localStorage.getItem('appointments');
-      if (raw) return JSON.parse(raw) as Appointment[];
+// Helper to get initial appointments from localStorage
+const getInitialAppointments = (): Appointment[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('appointments');
+    if (raw) {
+      return JSON.parse(raw) as Appointment[];
     }
-    return [];
+  } catch {
+    // Invalid JSON, return empty array
   }
-);
+  return [];
+};
+
+// appointments - writable atom initialized from localStorage
+export const appointmentsAtom = atom<Appointment[]>(getInitialAppointments());
+
+// Helper atom for persisting appointments with localStorage sync
 export const persistAppointmentsAtom = atom(
   null,
   (get, set, update: Appointment[]) => {
-    set(appointmentsAtom as WritableAtom<Appointment[], [unknown], void>, update);
+    set(appointmentsAtom, update);
     if (typeof window !== 'undefined') {
       localStorage.setItem('appointments', JSON.stringify(update));
     }
