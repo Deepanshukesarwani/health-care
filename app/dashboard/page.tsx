@@ -212,6 +212,7 @@ const Dashboard = () => {
                     doctor={doctor}
                     onViewDetails={handleViewDetails}
                     onBookAppointment={handleBookAppointment}
+                    onClick={() => handleBookAppointment(doctor)}
                   />
                 ))
               )}

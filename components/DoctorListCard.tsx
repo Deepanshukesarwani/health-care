@@ -14,11 +14,27 @@ interface DoctorListCardProps {
   doctor: typeof mockDoctors[number];
   onViewDetails: (doctor: typeof mockDoctors[number]) => void;
   onBookAppointment: (doctor: typeof mockDoctors[number]) => void;
+  onClick: () => void; 
 }
 
-const DoctorListCard = ({ doctor, onViewDetails, onBookAppointment }: DoctorListCardProps) => {
+const DoctorListCard = ({ doctor, onViewDetails, onBookAppointment, onClick }: DoctorListCardProps) => {
+  const handleCardClick = () => {
+    if (doctor.acceptingNewPatients && onClick) {
+      onClick();
+    }
+  };
+
+  const handleDropdownClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+    <Card 
+      className={`border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md ${
+        doctor.acceptingNewPatients ? 'cursor-pointer' : 'cursor-default'
+      }`}
+      onClick={handleCardClick}
+    >
       <div className="p-4 flex items-center gap-4">
         {/* Profile Image */}
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary shrink-0">
@@ -58,18 +74,29 @@ const DoctorListCard = ({ doctor, onViewDetails, onBookAppointment }: DoctorList
         {/* Actions Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="shrink-0"
+              onClick={handleDropdownClick}
+            >
               <MoreVertical className="h-5 w-5" />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => onViewDetails(doctor)}>
+          <DropdownMenuContent align="end" className="w-48" onClick={handleDropdownClick}>
+            <DropdownMenuItem onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails(doctor);
+            }}>
               <Eye className="mr-2 h-4 w-4" />
               View Details
             </DropdownMenuItem>
             <DropdownMenuItem 
-              onClick={() => onBookAppointment(doctor)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onBookAppointment(doctor);
+              }}
               disabled={!doctor.acceptingNewPatients}
             >
               <Calendar className="mr-2 h-4 w-4" />
