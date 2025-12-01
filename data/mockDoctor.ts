@@ -16,9 +16,9 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Headache", "Migraine", "Seizures", "Sleep Disorders"],
     fee: 800,
     availableSlots: [
-      "2025-11-25 09:00",
-      "2025-11-25 11:00",
-      "2025-11-26 10:00"
+      "2025-12-01 14:00",
+      "2025-12-01 16:00",
+      "2025-12-02 10:00"
     ]
   },
   {
@@ -33,9 +33,9 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Acne", "Eczema", "Psoriasis", "Skin Rash"],
     fee: 600,
     availableSlots: [
-      "2025-11-25 14:00",
-      "2025-11-26 09:30",
-      "2025-11-27 11:30"
+      "2025-12-01 15:00",
+      "2025-12-02 09:30",
+      "2025-12-03 11:30"
     ]
   },
   {
@@ -50,8 +50,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Anxiety", "Depression", "Mood Disorders"],
     fee: 1000,
     availableSlots: [
-      "2025-11-28 09:00",
-      "2025-11-28 15:00"
+      "2025-12-02 09:00",
+      "2025-12-02 15:00"
     ]
   },
   {
@@ -66,9 +66,9 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Fever", "Cough", "Cold", "Sore Throat"],
     fee: 400,
     availableSlots: [
-      "2025-11-25 10:00",
-      "2025-11-25 16:00",
-      "2025-11-26 13:00"
+      "2025-12-01 13:00",
+      "2025-12-01 17:00",
+      "2025-12-02 13:00"
     ]
   },
   {
@@ -83,8 +83,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Fever in children", "Flu", "Allergies", "Growth Issues"],
     fee: 650,
     availableSlots: [
-      "2025-11-25 09:15",
-      "2025-11-26 12:00"
+      "2025-12-01 14:30",
+      "2025-12-02 12:00"
     ]
   },
   {
@@ -99,8 +99,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Chest Pain", "BP Issues", "Arrhythmia"],
     fee: 1200,
     availableSlots: [
-      "2025-11-27 10:30",
-      "2025-11-28 14:00"
+      "2025-12-03 10:30",
+      "2025-12-04 14:00"
     ]
   },
   {
@@ -115,8 +115,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Allergies", "Skin Rash", "Hair Fall"],
     fee: 550,
     availableSlots: [
-      "2025-11-25 11:30",
-      "2025-11-26 15:00"
+      "2025-12-01 15:30",
+      "2025-12-02 15:00"
     ]
   },
   {
@@ -131,8 +131,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Fever", "Throat Pain", "Mild Infections"],
     fee: 300,
     availableSlots: [
-      "2025-11-25 12:00",
-      "2025-11-25 17:00"
+      "2025-12-01 16:00",
+      "2025-12-02 10:00"
     ]
   },
   {
@@ -147,8 +147,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Stress", "Panic Attacks", "Depression"],
     fee: 900,
     availableSlots: [
-      "2025-11-26 09:45",
-      "2025-11-26 12:45"
+      "2025-12-02 09:45",
+      "2025-12-02 12:45"
     ]
   },
   {
@@ -163,8 +163,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Migraines", "Stroke Aftercare"],
     fee: 1100,
     availableSlots: [
-      "2025-11-27 11:00",
-      "2025-11-27 16:00"
+      "2025-12-03 11:00",
+      "2025-12-03 16:00"
     ]
   },
   {
@@ -179,8 +179,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Child Fever", "Food Allergies"],
     fee: 500,
     availableSlots: [
-      "2025-11-25 10:30",
-      "2025-11-26 14:30"
+      "2025-12-01 14:00",
+      "2025-12-02 14:30"
     ]
   },
   {
@@ -195,8 +195,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Heart Disease", "Palpitations"],
     fee: 1500,
     availableSlots: [
-      "2025-11-26 11:00",
-      "2025-11-27 13:00"
+      "2025-12-02 11:00",
+      "2025-12-03 13:00"
     ]
   },
   {
@@ -211,8 +211,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Pigmentation", "Acne", "Skin Infection"],
     fee: 500,
     availableSlots: [
-      "2025-11-25 12:45",
-      "2025-11-26 10:15"
+      "2025-12-01 16:30",
+      "2025-12-02 10:15"
     ]
   },
   {
@@ -227,8 +227,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Diabetes", "BP", "Fever"],
     fee: 450,
     availableSlots: [
-      "2025-11-28 09:00",
-      "2025-11-28 11:30"
+      "2025-12-04 09:00",
+      "2025-12-04 11:30"
     ]
   },
   {
@@ -243,8 +243,8 @@ export const mockDoctors: Doctor[] = [
     conditionsTreated: ["Anxiety", "Stress", "Depression"],
     fee: 700,
     availableSlots: [
-      "2025-11-26 16:00",
-      "2025-11-27 10:00"
+      "2025-12-02 16:00",
+      "2025-12-03 10:00"
     ]
   }
 ];
